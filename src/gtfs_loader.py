@@ -1,0 +1,61 @@
+import pandas as pd
+from datetime import datetime
+
+class GTFSLoader:
+    def __init__(self, data_path='./data/'):
+        self.data_path = data_path
+        self.calendar_dates = None
+        self.calendar = None
+        self.routes = None
+        self.stop_times = None
+        self.stops = None
+        self.trips = None
+
+    def _time_to_seconds(self, time_str):
+        """Converts HH:MM:SS to total seconds from midnight."""
+        h, m, s = map(int, time_str.split(':'))
+        return h * 3600 + m * 60 + s
+
+    def load_all(self, target_date=str(datetime.now().date()).replace('-', '')):
+        """Loads all GTFS data and filters it based on the target date."""
+        self.calendar_dates = pd.read_csv(self.data_path + 'calendar_dates.txt')
+        self.calendar = pd.read_csv(self.data_path + 'calendar.txt')
+        self.routes = pd.read_csv(self.data_path + 'routes.txt')
+        self.stop_times = pd.read_csv(self.data_path + 'stop_times.txt')
+        self.stops = pd.read_csv(self.data_path + 'stops.txt')
+        self.trips = pd.read_csv(self.data_path + 'trips.txt')
+
+        # get active services for given date
+        active_services = self.get_active_services(target_date)
+
+        # filter trips based on active services
+        self.trips = self.trips[self.trips['service_id'].isin(active_services)]
+
+        # filter and prepare stop_times
+        self.stop_times = self.stop_times[self.stop_times['trip_id'].isin(self.trips['trip_id'])]
+        self.stop_times['arr_sec'] = self.stop_times['arrival_time'].apply(self._time_to_seconds)
+        self.stop_times['dep_sec'] = self.stop_times['departure_time'].apply(self._time_to_seconds)
+
+        # sort stop times for easier processing
+        self.stop_times = self.stop_times.sort_values(['trip_id', 'stop_sequence'])
+
+    def get_active_services(self, date_str):
+        """Returns a set of active service_ids for the given date."""
+        date_obj = datetime.strptime(date_str, '%Y%m%d')
+        day_name = date_obj.strftime('%A').lower()
+
+        # check date range in calendar.txt
+        mask = ((self.calendar['start_date'] <= int(date_str)) &
+               (self.calendar['end_date'] >= int(date_str)) &
+               (self.calendar[day_name] == 1))
+        services = set(self.calendar.loc[mask, 'service_id'])
+        
+        # check exceptions in calendar_dates.txt
+        exceptions = self.calendar_dates[self.calendar_dates['date'] == int(date_str)]
+        for _, row in exceptions.iterrows():
+            if row['exception_type'] == 1:  # service added
+                services.add(row['service_id'])
+            elif row['exception_type'] == 2:  # service removed
+                services.discard(row['service_id'])
+        
+        return services
