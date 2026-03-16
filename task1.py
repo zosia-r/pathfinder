@@ -25,4 +25,4 @@ for stop_id, edges in list(graph.items())[:3]:
             "arr:", arr_time,
             "line:", edge.route_name
         )
-        print("----" * 10)
+    print("----" * 10)
