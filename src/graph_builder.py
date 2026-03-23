@@ -26,7 +26,7 @@ class Edge:
         return self.arrival - self.departure
 
     def __repr__(self):
-        return f"({self.departure}) --> {self.to_stop} ({self.arrival})"
+        return f"({self.departure}) --> {self.to_stop} ({self.arrival}) via line {self.route_name}"
 
 
 class GraphBuilder:
@@ -109,6 +109,19 @@ class GraphBuilder:
         s = int(sec % 60)
         return f"{h:02}:{m:02}:{s:02}"
     
+    def get_metadata(self):
+        metadata = {}
+        for _, row in self.stops.iterrows():
+            id = row["stop_id"]
+            parent = row["parent_station"]
+            if id == parent:
+                metadata[id] = Stop(
+                    stop_id=id,
+                    stop_name=row["stop_name"],
+                    lat=row.get("stop_lat"),
+                    lon=row.get("stop_lon"),
+                )
+        return metadata
 
     def print_departures(self, station_id):
         if station_id not in self.graph:
@@ -122,20 +135,4 @@ class GraphBuilder:
             print(f"  To {edge.to_stop} at {dep_time} (arrives at {arr_time}) via route {edge.route_name} (trip {edge.trip_id})")
 
 
-class MetadataBuilder:
-    def __init__(self, stops_df):
-        self.stops_df = stops_df
-        self.metadata = {}
 
-    def build_metadata(self):
-        for _, row in self.stops_df.iterrows():
-            id = row["stop_id"]
-            parent = row["parent_station"]
-            if id == parent:
-                self.metadata[id] = Stop(
-                    stop_id=id,
-                    stop_name=row["stop_name"],
-                    lat=row.get("stop_lat"),
-                    lon=row.get("stop_lon"),
-                )
-        return self.metadata
