@@ -64,23 +64,3 @@ class GTFSLoader:
                 services.discard(row['service_id'])
         
         return services
-    
-    def print_heads(self):
-        print("Calendar Dates:")
-        print(self.calendar_dates.head())
-        print(self.calendar_dates.dtypes)
-        print("\nCalendar:")
-        print(self.calendar.head())
-        print(self.calendar.dtypes)
-        print("\nRoutes:")
-        print(self.routes.head())
-        print(self.routes.dtypes)
-        print("\nStop Times:")
-        print(self.stop_times.head())
-        print(self.stop_times.dtypes)
-        print("\nStops:")
-        print(self.stops.head())
-        print(self.stops.dtypes)
-        print("\nTrips:")
-        print(self.trips.head())
-        print(self.trips.dtypes)

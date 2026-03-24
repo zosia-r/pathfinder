@@ -52,7 +52,6 @@ class OutputFormatter:
 
     @staticmethod
     def print_stdout(segments, metadata):
-        """Prints the formatted table to standard output."""
         if not segments:
             print("Connection not found.")
             return

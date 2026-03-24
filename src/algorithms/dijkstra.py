@@ -3,10 +3,9 @@ import heapq
 class Dijkstra:
 
     def __init__(self, builder):
-        # graph is a dictionary: { station_id: [Edge, Edge, ...] }
         self.graph = builder.build_graph()
 
-    def shortest_path(self, start_station, goal_station, start_time, mode="t", transfer_buffer=5):
+    def shortest_path(self, start_station, goal_station, start_time, transfer_buffer=5):
         if start_station not in self.graph or goal_station not in self.graph:
             return None, float("inf")
 
@@ -17,11 +16,7 @@ class Dijkstra:
         parent_edge = {}
         entry_count = 0  # tie-breaker for the priority queue
         
-        
-        if mode == "t":
-            initial_cost = start_time
-        else:
-            initial_cost = 0
+        initial_cost = start_time
         
         # elements in queue: (cost, tie_breaker, current_time, station_id, trip_id)
         heapq.heappush(priority_queue, (initial_cost, entry_count, start_time, start_station, None))
@@ -43,10 +38,7 @@ class Dijkstra:
                 if edge.departure < required_departure:
                     continue
 
-                if mode == "t":
-                    new_cost = edge.arrival
-                else:
-                    new_cost = cost + is_transfer
+                new_cost = edge.arrival
 
                 v = edge.to_stop
                 if v not in best_costs or new_cost < best_costs[v]:
@@ -56,7 +48,7 @@ class Dijkstra:
                     entry_count += 1
                     heapq.heappush(priority_queue, (new_cost, entry_count, edge.arrival, v, edge.trip_id))
 
-        return None, (float("inf"), float("inf"))
+        return None, float("inf")
 
     def _reconstruct_path(self, parent, parent_edge, start_station, goal_station):
         path = []

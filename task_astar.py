@@ -1,11 +1,11 @@
 import sys
 import time
 from datetime import datetime
-from src.gtfs_loader import GTFSLoader
-from src.graph_builder import GraphBuilder
+from src.utils.gtfs_loader import GTFSLoader
+from src.utils.graph_builder import GraphBuilder
 # Importujemy nową klasę AStar
 from src.algorithms.astar import AStar 
-from src.output_formatter import OutputFormatter
+from src.utils.output_formatter import OutputFormatter
 
 USAGE = (
     "Użycie: python task_astar.py <A> <B> <t|p> [YYYYMMDD] [HH:MM]\n"

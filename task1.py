@@ -1,16 +1,15 @@
 import sys
 import time
 from datetime import datetime
-from src.gtfs_loader import GTFSLoader
-from src.graph_builder import GraphBuilder
+from src.utils.gtfs_loader import GTFSLoader
+from src.utils.graph_builder import GraphBuilder
 from src.algorithms.dijkstra import Dijkstra
-from src.output_formatter import OutputFormatter
+from src.utils.output_formatter import OutputFormatter
 
 
 USAGE = (
     "Użycie: python task1.py <A> <B> <t|p> [YYYYMMDD] [HH:MM]\n"
     "  A, B      – nazwy stacji (np. 'Wrocław Główny')\n"
-    "  t|p       – kryterium: t = czas, p = liczba przesiadek\n"
     "  YYYYMMDD  – data podróży (domyślnie: dzisiaj)\n"
     "  HH:MM     – godzina odjazdu (domyślnie: teraz)\n"
 )
@@ -19,24 +18,18 @@ USAGE = (
 def parse_args():
     args = sys.argv[1:]
 
-    if len(args) < 3:
+    if len(args) < 2:
         print(USAGE)
         sys.exit(1)
 
     start_name = args[0]
     end_name   = args[1]
-    mode_raw   = args[2].strip().lower()
-
-    if mode_raw not in ("t", "p", "time", "transfers"):
-        print(f"Nieprawidłowe kryterium: '{mode_raw}'. Użyj 't' lub 'p'.")
-        sys.exit(1)
-    mode = "t" if mode_raw in ("t", "time") else "p"
 
     now = datetime.now()
 
     # Data – opcjonalna
-    if len(args) >= 4:
-        target_date = args[3].strip()
+    if len(args) >= 3:
+        target_date = args[2].strip()
         try:
             datetime.strptime(target_date, "%Y%m%d")
         except ValueError:
@@ -46,8 +39,8 @@ def parse_args():
         target_date = now.strftime("%Y%m%d")
 
     # Godzina – opcjonalna
-    if len(args) >= 5:
-        time_str = args[4].strip()
+    if len(args) >= 4:
+        time_str = args[3].strip()
         parts = time_str.split(":")
         if len(parts) == 2:
             time_str += ":00"
@@ -57,7 +50,7 @@ def parse_args():
     else:
         time_str = now.strftime("%H:%M:%S")
 
-    return start_name, end_name, mode, target_date, time_str
+    return start_name, end_name, target_date, time_str
 
 
 def find_parent_station_id(name, metadata):
@@ -70,7 +63,7 @@ def find_parent_station_id(name, metadata):
 
 
 def main():
-    start_name, end_name, mode, target_date, start_time_str = parse_args()
+    start_name, end_name, target_date, start_time_str = parse_args()
 
     # Ładowanie danych GTFS
     loader = GTFSLoader()
@@ -100,7 +93,7 @@ def main():
     # Szukanie trasy
     dijkstra = Dijkstra(builder)
     start_perf = time.perf_counter()
-    path, cost = dijkstra.shortest_path(start_id, end_id, start_time_sec, mode=mode)
+    path, cost = dijkstra.shortest_path(start_id, end_id, start_time_sec)
     execution_time = time.perf_counter() - start_perf
 
     if path is None:
@@ -110,7 +103,7 @@ def main():
     # Formatowanie i wypisywanie
     segments = OutputFormatter.format_path(path)
     OutputFormatter.print_stdout(segments, metadata)
-    OutputFormatter.print_stderr(cost, execution_time, mode)
+    OutputFormatter.print_stderr(cost, execution_time, mode="t")
 
 
 if __name__ == "__main__":
