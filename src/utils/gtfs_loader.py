@@ -13,7 +13,6 @@ class GTFSLoader:
         self.trips = None
 
     def load_all(self, target_date=None):
-        """Loads all GTFS data and filters it based on the target date."""
         if target_date is None:
             target_date = datetime.now().strftime('%Y%m%d')
             
@@ -42,7 +41,6 @@ class GTFSLoader:
         self.stop_times = self.stop_times.sort_values(['trip_id', 'stop_sequence'])
 
     def get_active_services(self, date_str):
-        """Returns a set of active service_ids for the given date."""
         date_obj = datetime.strptime(date_str, '%Y%m%d')
         day_name = date_obj.strftime('%A').lower()
 

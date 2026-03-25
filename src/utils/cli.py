@@ -16,7 +16,7 @@ def parse_args(args, USAGE, list_mode=False):
     else:
         end_name = args[1]
         
-    mode       = args[2]
+    mode = args[2]
 
     if mode not in ('t', 'p'):
         print(f"Invalid mode: '{mode}'. Expected 't' for time or 'p' for transfers.")

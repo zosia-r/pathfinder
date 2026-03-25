@@ -53,6 +53,7 @@ class OutputFormatter:
 
     @staticmethod
     def print_stdout(segments, metadata):
+        """Prints the path segments in a human-readable format."""
         if not segments:
             print("Connection not found.")
             return

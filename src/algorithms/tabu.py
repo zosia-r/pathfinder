@@ -1,6 +1,4 @@
 import random
-import copy
-import time
 from collections import deque
 
 class TabuSearch:
@@ -12,16 +10,14 @@ class TabuSearch:
         self.start_time = start_time
         self.fixed_tabu_size = fixed_tabu_size
         
-        self.tabu_list = deque()
+        self.tabu_list = deque() #double-ended queue -> FIFO
         self.max_tabu_size = len(locations) * 2  if self.fixed_tabu_size else None
         self.best_solution = None
         self.best_cost = float('inf')
         
-        # cache dict for storing previously computed path costs to avoid redundant A* calls
         self.cost_cache = {}
 
     def get_path_cost(self, u, v, current_time):
-        """Uses A* to get the path and cost from u to v starting at current_time, with caching."""
         state_key = (u, v, current_time)
         if state_key in self.cost_cache:
             return self.cost_cache[state_key]
@@ -123,7 +119,6 @@ class TabuSearch:
         return final_path, self.best_cost
 
     def get_sampled_neighbors(self, tour, sample_size):
-        """Generates a random sample of neighboring tours by swapping two locations in the tour."""
         neighbors = []
         n = len(tour)
         all_possible_moves = [(i, j) for i in range(n) for j in range(i + 1, n)]

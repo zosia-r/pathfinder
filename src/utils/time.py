@@ -5,7 +5,6 @@ def sec_to_time(sec):
     s = int(sec % 60)
     return f"{h:02}:{m:02}:{s:02}"
 
-
 def time_to_seconds(time_str):
     if len(time_str.split(':')) == 2:
         time_str += ":00"
