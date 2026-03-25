@@ -84,5 +84,5 @@ class OutputFormatter:
             label = "Number of Transfers"
 
         sys.stderr.write("\n[METRICS]\n")
-        sys.stderr.write(f"{label}: {int(cost)}\n")
+        sys.stderr.write(f"{label}: {cost}\n")
         sys.stderr.write(f"Calculation Time: {execution_time:.6f} s\n")
