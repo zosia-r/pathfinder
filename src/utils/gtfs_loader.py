@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import datetime
+from src.utils.time import time_to_seconds
 
 class GTFSLoader:
     def __init__(self, data_path='./data/'):
@@ -11,15 +12,11 @@ class GTFSLoader:
         self.stops = None
         self.trips = None
 
-    def _time_to_seconds(self, time_str):
-        """Converts HH:MM:SS to total seconds from midnight."""
-        if len(time_str.split(':')) == 2:
-            time_str += ":00"
-        h, m, s = map(int, time_str.split(':'))
-        return h * 3600 + m * 60 + s
-
-    def load_all(self, target_date=str(datetime.now().date()).replace('-', '')):
+    def load_all(self, target_date=None):
         """Loads all GTFS data and filters it based on the target date."""
+        if target_date is None:
+            target_date = datetime.now().strftime('%Y%m%d')
+            
         self.calendar_dates = pd.read_csv(self.data_path + 'calendar_dates.txt', dtype={'date': str})
         self.calendar = pd.read_csv(self.data_path + 'calendar.txt', dtype={'start_date': str, 'end_date': str})
         self.routes = pd.read_csv(self.data_path + 'routes.txt', dtype={'route_id': str})
@@ -38,8 +35,8 @@ class GTFSLoader:
         
         # filter and prepare stop_times
         self.stop_times = self.stop_times[self.stop_times['trip_id'].isin(self.trips['trip_id'])]
-        self.stop_times['arr_sec'] = self.stop_times['arrival_time'].apply(self._time_to_seconds)
-        self.stop_times['dep_sec'] = self.stop_times['departure_time'].apply(self._time_to_seconds)
+        self.stop_times['arr_sec'] = self.stop_times['arrival_time'].apply(time_to_seconds)
+        self.stop_times['dep_sec'] = self.stop_times['departure_time'].apply(time_to_seconds)
 
         # sort stop times for easier processing
         self.stop_times = self.stop_times.sort_values(['trip_id', 'stop_sequence'])

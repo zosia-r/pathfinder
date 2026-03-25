@@ -2,9 +2,9 @@ import heapq
 import math
 
 class AStar:
-    def __init__(self, builder, metadata):
+    def __init__(self, graph, metadata):
         # Initialize graph and station data
-        self.graph = builder.build_graph()
+        self.graph = graph
         self.metadata = metadata
 
     def haversine(self, stop1, stop2):

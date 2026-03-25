@@ -1,5 +1,6 @@
 from collections import defaultdict
 import pandas as pd
+from src.utils.time import sec_to_time
 
 class Stop:
     def __init__(self, stop_id, stop_name, lat=None, lon=None, lines=None):
@@ -105,13 +106,6 @@ class GraphBuilder:
             self.graph[station_id].sort(key=lambda e: e.departure)
 
         return self.graph
-
-
-    def _sec_to_time(self, sec):
-        h = int(sec // 3600)
-        m = int((sec % 3600) // 60)
-        s = int(sec % 60)
-        return f"{h:02}:{m:02}:{s:02}"
     
     def get_metadata(self):
         
@@ -136,6 +130,6 @@ class GraphBuilder:
         
         print(f"Departures from station {station_id}:")
         for edge in self.graph[station_id][:limit]:
-            dep_time = self._sec_to_time(edge.departure)
-            arr_time = self._sec_to_time(edge.arrival)
+            dep_time = sec_to_time(edge.departure)
+            arr_time = sec_to_time(edge.arrival)
             print(f"  To {edge.to_stop} at {dep_time} (arrives at {arr_time}) via route {edge.route_name} (trip {edge.trip_id})")

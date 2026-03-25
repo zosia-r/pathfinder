@@ -1,4 +1,5 @@
 import sys
+from src.utils.time import sec_to_time
 
 class OutputFormatter:
 
@@ -66,8 +67,8 @@ class OutputFormatter:
         for seg in segments:
             from_name = metadata[seg["from"]].stop_name
             to_name   = metadata[seg["to"]].stop_name
-            dep_time  = OutputFormatter.sec_to_time(seg["dep"])
-            arr_time  = OutputFormatter.sec_to_time(seg["arr"])
+            dep_time  = sec_to_time(seg["dep"])
+            arr_time  = sec_to_time(seg["arr"])
 
             print(
                 f"{from_name:<30} | {to_name:<30} | "
@@ -85,10 +86,3 @@ class OutputFormatter:
         sys.stderr.write("\n[METRICS]\n")
         sys.stderr.write(f"{label}: {int(cost)}\n")
         sys.stderr.write(f"Calculation Time: {execution_time:.6f} s\n")
-
-    @staticmethod
-    def sec_to_time(sec):
-        h = int(sec // 3600)
-        m = int((sec % 3600) // 60)
-        s = int(sec % 60)
-        return f"{h:02}:{m:02}:{s:02}"
