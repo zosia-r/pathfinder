@@ -3,7 +3,7 @@ import copy
 import time
 from collections import deque
 
-class TabuSearchSolver:
+class TabuSearch:
     def __init__(self, astar_solver, start_node, locations, mode="t", start_time=0, fixed_tabu_size=False):
         self.astar = astar_solver
         self.start_node = start_node
@@ -36,6 +36,7 @@ class TabuSearchSolver:
         current_node = self.start_node
         total_cost = 0
         full_detailed_path = []
+        current_trip = None
 
         for next_node in tour:
             path, cost = self.get_path_cost(current_node, next_node, current_time)
@@ -46,7 +47,14 @@ class TabuSearchSolver:
                 total_cost += duration
                 current_time = cost
             else:
-                total_cost += cost
+                segment_transfers = 0
+                for _, edge in path:
+                    if edge is None:
+                        continue
+                    if current_trip is not None and edge.trip_id != current_trip:
+                        segment_transfers += 1
+                    current_trip = edge.trip_id
+                total_cost += segment_transfers
                 current_time = path[-1][1].arrival if path[-1][1] else current_time
             
             if full_detailed_path:
@@ -62,7 +70,14 @@ class TabuSearchSolver:
         if self.mode == 't':
             total_cost += (cost - current_time)
         else:
-            total_cost += cost
+            segment_transfers = 0
+            for _, edge in path:
+                if edge is None:
+                    continue
+                if current_trip is not None and edge.trip_id != current_trip:
+                    segment_transfers += 1
+                current_trip = edge.trip_id
+            total_cost += segment_transfers
             
         full_detailed_path.extend(path)
         return total_cost, full_detailed_path

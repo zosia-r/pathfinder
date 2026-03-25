@@ -1,13 +1,13 @@
 import sys
 import time
 from src.algorithms.astar import AStar
-from src.algorithms.tabu import TabuSearchSolver
+from src.algorithms.tabu import TabuSearch
 from src.utils.output_formatter import OutputFormatter
 from src.utils.time import time_to_seconds
 from src.utils.cli import parse_args, find_parent_station_id, get_data
 
 USAGE = (
-    "Usage: python task_tabu.py <A> <L> <t|p> [YYYYMMDD] [HH:MM]\n"
+    "Usage: python main_tabu.py <A> <L> <t|p> [YYYYMMDD] [HH:MM]\n"
     "  A        – start station (np. 'Wrocław Główny')\n"
     "  L        – list of station names to visit, separated by semicolons (e.g., 'Legnica;Lubin')\n"
     "  t|p      – criterion: t = time, p = number of transfers\n"
@@ -51,7 +51,7 @@ def main():
 
     # Finding the path
     astar = AStar(graph, metadata)
-    tabu = TabuSearchSolver(astar, start_id, locations_ids, mode, start_time_sec)
+    tabu = TabuSearch(astar, start_id, locations_ids, mode, start_time_sec)
     start_perf = time.perf_counter()
     final_path, total_cost = tabu.solve(iterations=50, sample_size=15)
     execution_time = time.perf_counter() - start_perf
