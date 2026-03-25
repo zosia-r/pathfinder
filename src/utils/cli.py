@@ -3,14 +3,19 @@ from datetime import datetime
 from src.utils.gtfs_loader import GTFSLoader
 from src.utils.graph_builder import GraphBuilder
 
-def parse_args(args, USAGE):
+def parse_args(args, USAGE, list_mode=False):
 
     if len(args) < 3:
         print(USAGE)
         sys.exit(1)
 
     start_name = args[0]
-    end_name   = args[1]
+
+    if list_mode:
+        end_name = args[1].split(';')
+    else:
+        end_name = args[1]
+        
     mode       = args[2]
 
     if mode not in ('t', 'p'):
